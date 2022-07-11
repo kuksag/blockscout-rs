@@ -1,12 +1,13 @@
-use actix_web::web;
+use paperclip::actix::web::{self};
 
-use super::Router;
 use crate::{
     compiler::Compilers,
     config::SolidityConfiguration,
     http_server::handlers::{multi_part, standard_json, version_list},
     solidity::CompilerFetcher,
 };
+
+use super::Router;
 
 pub struct SolidityRouter {
     compilers: web::Data<Compilers<CompilerFetcher>>,

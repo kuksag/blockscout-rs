@@ -1,11 +1,13 @@
+use std::{collections::BTreeMap, path::PathBuf, str::FromStr};
+
 use ethers_solc::{
     artifacts::{Libraries, Settings, Source, Sources},
     CompilerInput, EvmVersion,
 };
+use paperclip::{actix::Apiv2Schema, v2::schema::Apiv2Schema};
 use serde::{Deserialize, Serialize};
-use std::{collections::BTreeMap, path::PathBuf, str::FromStr};
 
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Serialize, Apiv2Schema)]
 pub struct VerificationRequest<T> {
     pub deployed_bytecode: String,
     pub creation_bytecode: String,
@@ -22,6 +24,8 @@ pub struct MultiPartFiles {
     optimization_runs: Option<usize>,
     contract_libraries: Option<BTreeMap<String, String>>,
 }
+
+impl Apiv2Schema for MultiPartFiles {}
 
 impl TryFrom<MultiPartFiles> for CompilerInput {
     type Error = anyhow::Error;
@@ -66,6 +70,7 @@ impl TryFrom<MultiPartFiles> for CompilerInput {
 pub struct StandardJson {
     input: CompilerInput,
 }
+impl Apiv2Schema for StandardJson {}
 
 impl From<StandardJson> for CompilerInput {
     fn from(input: StandardJson) -> Self {
@@ -73,15 +78,16 @@ impl From<StandardJson> for CompilerInput {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Apiv2Schema)]
 pub struct VersionsResponse {
     pub versions: Vec<String>,
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use crate::tests::parse::test_deserialize_ok;
+
+    use super::*;
 
     fn sources(sources: &[(&str, &str)]) -> BTreeMap<PathBuf, String> {
         sources

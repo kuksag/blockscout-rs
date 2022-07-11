@@ -1,6 +1,8 @@
-use super::{configure_router, Router, SolidityRouter, SourcifyRouter};
+use paperclip::actix::web::{self};
+
 use crate::{config::Config, http_server::handlers::status};
-use actix_web::web;
+
+use super::{configure_router, Router, SolidityRouter, SourcifyRouter};
 
 pub struct AppRouter {
     solidity: Option<SolidityRouter>,

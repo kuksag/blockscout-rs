@@ -1,9 +1,11 @@
-use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
+
+use paperclip::actix::Apiv2Schema;
+use serde::{Deserialize, Serialize};
 
 // This struct is used as input for our endpoint and as
 // input for sourcify endpoint at the same time
-#[derive(Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Debug, Deserialize, Serialize, PartialEq, Apiv2Schema)]
 #[serde(rename_all = "camelCase")]
 pub struct ApiRequest {
     pub address: String,
@@ -12,7 +14,7 @@ pub struct ApiRequest {
     pub chosen_contract: Option<usize>,
 }
 
-#[derive(Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Debug, Deserialize, Serialize, PartialEq, Apiv2Schema)]
 pub struct Files(pub BTreeMap<String, String>);
 
 // Definition of sourcify.dev API response
@@ -69,11 +71,12 @@ impl TryFrom<ApiFilesResponse> for Files {
 
 #[cfg(test)]
 mod tests {
+    use std::collections::BTreeMap;
+
     use crate::{
         http_server::handlers::sourcify::types::{ApiRequest, Files},
         tests::parse::test_deserialize_ok,
-    };
-    use std::collections::BTreeMap;
+        };
 
     #[test]
     fn deserialize_api_request() {

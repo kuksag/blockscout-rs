@@ -1,15 +1,17 @@
 #![allow(dead_code)]
 
-use ethers_solc::CompilerInput;
 use std::{collections::BTreeMap, fmt::Display};
 
-use crate::{compiler::CompilerVersion, solidity::VerificationSuccess, DisplayBytes};
+use ethers_solc::CompilerInput;
+use paperclip::{actix::Apiv2Schema, v2::schema::Apiv2Schema};
 use serde::{Deserialize, Serialize};
+
+use crate::{compiler::CompilerVersion, solidity::VerificationSuccess, DisplayBytes};
 
 pub mod solidity;
 pub mod sourcify;
 
-#[derive(Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Debug, Deserialize, Serialize, PartialEq, Apiv2Schema)]
 pub struct VerificationResponse {
     pub message: String,
     pub result: Option<VerificationResult>,
@@ -28,6 +30,20 @@ pub struct VerificationResult {
     pub contract_libraries: BTreeMap<String, String>,
     pub abi: String,
     pub sources: BTreeMap<String, String>,
+}
+
+impl Apiv2Schema for VerificationResult {
+    fn name() -> Option<String> {
+        Some("VerificationResult".to_string())
+    }
+
+    fn description() -> &'static str {
+        "Verification result"
+    }
+
+    fn required() -> bool {
+        false
+    }
 }
 
 impl From<(CompilerInput, CompilerVersion, VerificationSuccess)> for VerificationResult {
@@ -68,7 +84,7 @@ impl From<(CompilerInput, CompilerVersion, VerificationSuccess)> for Verificatio
     }
 }
 
-#[derive(Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Debug, Deserialize, Serialize, PartialEq, Apiv2Schema)]
 pub enum VerificationStatus {
     #[serde(rename = "0")]
     Ok,
@@ -96,9 +112,11 @@ impl VerificationResponse {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::tests::parse::test_serialize_json_ok;
     use serde_json::json;
+
+    use crate::tests::parse::test_serialize_json_ok;
+
+    use super::*;
 
     #[test]
     fn parse_response() {

@@ -1,11 +1,14 @@
-pub mod handlers;
-mod routers;
+use std::sync::Arc;
 
-pub use self::routers::{configure_router, AppRouter, Router};
+use actix_web::{App, HttpServer};
+use paperclip::actix::OpenApiExt;
 
 use crate::config::Config;
-use actix_web::{App, HttpServer};
-use std::sync::Arc;
+
+pub use self::routers::{AppRouter, configure_router, Router};
+
+pub mod handlers;
+mod routers;
 
 pub async fn run(config: Config) -> std::io::Result<()> {
     let socket_addr = config.server.addr;
@@ -15,8 +18,14 @@ pub async fn run(config: Config) -> std::io::Result<()> {
             .await
             .expect("couldn't initialize the app"),
     );
-    HttpServer::new(move || App::new().configure(configure_router(&*app_router)))
-        .bind(socket_addr)?
-        .run()
-        .await
+    HttpServer::new(move || {
+        App::new()
+            .wrap_api()
+            .configure(configure_router(&*app_router))
+            .with_json_spec_at("/api/spec/v2")
+            .build()
+    })
+    .bind(socket_addr)?
+    .run()
+    .await
 }

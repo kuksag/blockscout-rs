@@ -1,10 +1,11 @@
-use actix_web::web;
+use paperclip::actix::web::{self};
 
-use super::Router;
 use crate::{
     config::SourcifyConfiguration,
     http_server::handlers::sourcify::{self, SourcifyApiClient},
 };
+
+use super::Router;
 
 pub struct SourcifyRouter {
     api_client: web::Data<SourcifyApiClient>,

@@ -4,11 +4,14 @@ use crate::{
     solidity::CompilerFetcher,
 };
 
-use actix_web::{
+use actix_web::Error;
+
+use paperclip::actix::{
+    api_v2_operation,
     web::{self, Json},
-    Error,
 };
 
+#[api_v2_operation]
 pub async fn get_version_list(
     compilers: web::Data<Compilers<CompilerFetcher>>,
 ) -> Result<Json<VersionsResponse>, Error> {

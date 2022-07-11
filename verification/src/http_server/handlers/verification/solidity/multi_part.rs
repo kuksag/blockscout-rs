@@ -1,4 +1,11 @@
-use super::types::{MultiPartFiles, VerificationRequest};
+use std::str::FromStr;
+
+use actix_web::{error, Error};
+use paperclip::actix::{
+    api_v2_operation,
+    web::{self, Json},
+};
+
 use crate::{
     compiler::{CompilerVersion, Compilers},
     http_server::handlers::verification::{
@@ -7,13 +14,10 @@ use crate::{
     },
     solidity::CompilerFetcher,
 };
-use actix_web::{
-    error,
-    web::{self, Json},
-    Error,
-};
-use std::str::FromStr;
 
+use super::types::{MultiPartFiles, VerificationRequest};
+
+#[api_v2_operation]
 pub async fn verify(
     compilers: web::Data<Compilers<CompilerFetcher>>,
     params: Json<VerificationRequest<MultiPartFiles>>,

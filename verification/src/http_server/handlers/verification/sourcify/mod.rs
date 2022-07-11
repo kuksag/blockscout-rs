@@ -1,14 +1,19 @@
+use actix_web::error::Error;
+use paperclip::actix::{
+    api_v2_operation,
+    web::{self, Json},
+};
+
+use super::VerificationResponse;
+
+pub use self::api::SourcifyApiClient;
+use self::types::ApiRequest;
+
 mod api;
 mod metadata;
 mod types;
 
-pub use self::api::SourcifyApiClient;
-
-use self::types::ApiRequest;
-use actix_web::{error::Error, web, web::Json};
-
-use super::VerificationResponse;
-
+#[api_v2_operation]
 pub async fn verify(
     sourcify_client: web::Data<SourcifyApiClient>,
     params: Json<ApiRequest>,

@@ -4,7 +4,10 @@ use ethers_solc::{
     artifacts::{Libraries, Settings, Source, Sources},
     CompilerInput, EvmVersion,
 };
-use paperclip::{actix::Apiv2Schema, v2::schema::Apiv2Schema};
+use paperclip::{
+    actix::Apiv2Schema,
+    v2::{models::DefaultSchemaRaw, schema::Apiv2Schema},
+};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, PartialEq, Serialize, Apiv2Schema)]
@@ -25,7 +28,45 @@ pub struct MultiPartFiles {
     contract_libraries: Option<BTreeMap<String, String>>,
 }
 
-impl Apiv2Schema for MultiPartFiles {}
+impl Apiv2Schema for MultiPartFiles {
+    fn name() -> Option<String> {
+        Some("MultiPartFiles".to_string())
+    }
+
+    fn description() -> &'static str {
+        "MultiPartFiles"
+    }
+
+    fn required() -> bool {
+        true
+    }
+
+    fn raw_schema() -> DefaultSchemaRaw {
+        let mut schema = DefaultSchemaRaw::default();
+
+        schema.properties.insert(
+            "sources".into(),
+            BTreeMap::<String, String>::raw_schema().into(),
+        );
+        schema.required.insert("sources".into());
+
+        schema
+            .properties
+            .insert("evm_version".into(), String::raw_schema().into());
+        schema.required.insert("evm_version".into());
+
+        schema
+            .properties
+            .insert("optimization_runs".into(), u32::raw_schema().into());
+
+        schema.properties.insert(
+            "contract_libraries".into(),
+            BTreeMap::<String, String>::raw_schema().into(),
+        );
+
+        schema
+    }
+}
 
 impl TryFrom<MultiPartFiles> for CompilerInput {
     type Error = anyhow::Error;

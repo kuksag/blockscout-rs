@@ -3,7 +3,10 @@
 use std::{collections::BTreeMap, fmt::Display};
 
 use ethers_solc::CompilerInput;
-use paperclip::{actix::Apiv2Schema, v2::schema::Apiv2Schema};
+use paperclip::{
+    actix::Apiv2Schema,
+    v2::{models::DefaultSchemaRaw, schema::Apiv2Schema},
+};
 use serde::{Deserialize, Serialize};
 
 use crate::{compiler::CompilerVersion, solidity::VerificationSuccess, DisplayBytes};
@@ -32,6 +35,7 @@ pub struct VerificationResult {
     pub sources: BTreeMap<String, String>,
 }
 
+// We have to "impl Apiv2Schema" instead of "derive Apiv2Schema" because there is no default impl for DisplayBytes
 impl Apiv2Schema for VerificationResult {
     fn name() -> Option<String> {
         Some("VerificationResult".to_string())
@@ -43,6 +47,45 @@ impl Apiv2Schema for VerificationResult {
 
     fn required() -> bool {
         false
+    }
+
+    fn raw_schema() -> DefaultSchemaRaw {
+        let mut schema = DefaultSchemaRaw::default();
+        schema
+            .properties
+            .insert("file_name".to_string(), String::raw_schema().into());
+        schema
+            .properties
+            .insert("contract_name".to_string(), String::raw_schema().into());
+        schema
+            .properties
+            .insert("compiler_version".to_string(), String::raw_schema().into());
+        schema
+            .properties
+            .insert("evm_version".to_string(), String::raw_schema().into());
+        schema.properties.insert(
+            "constructor_arguments".to_string(),
+            String::raw_schema().into(),
+        );
+        schema
+            .properties
+            .insert("optimization".to_string(), bool::raw_schema().into());
+        schema
+            .properties
+            .insert("optimization_runs".to_string(), usize::raw_schema().into());
+        schema.properties.insert(
+            "contract_libraries".to_string(),
+            BTreeMap::<String, String>::raw_schema().into(),
+        );
+        schema
+            .properties
+            .insert("abi".to_string(), String::raw_schema().into());
+        schema.properties.insert(
+            "sources".to_string(),
+            BTreeMap::<String, String>::raw_schema().into(),
+        );
+
+        schema
     }
 }
 

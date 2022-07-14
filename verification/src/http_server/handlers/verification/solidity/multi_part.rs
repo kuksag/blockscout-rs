@@ -18,7 +18,7 @@ use std::str::FromStr;
 #[utoipa::path(
     post,
     path = "/api/v1/solidity/verify/multiple-files",
-    request_body = MultiPartFiles,
+    request_body(content = MultiPartFiles, content_type = "application/json", description = "Description for request body"),
     responses(
         (
             status = 200,
@@ -84,14 +84,6 @@ use std::str::FromStr;
                 }
             }),
         ),
-    ),
-    params(
-        ("multi_part_files" = MultiPartFiles, description = "Param 1 description", example = json!({
-            "files": {
-                "file1.sol": "...",
-                "file2.sol": "...",
-            },
-        })),
     ),
     tag = "solidity"
 )]

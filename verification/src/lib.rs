@@ -6,6 +6,7 @@ mod http_server;
 mod scheduler;
 mod solidity;
 mod types;
+mod openapi;
 
 #[cfg(test)]
 mod tests;

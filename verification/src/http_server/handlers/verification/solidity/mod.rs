@@ -1,5 +1,5 @@
 mod contract_verifier;
-mod types;
+pub(crate) mod types;
 
 pub mod multi_part;
 pub mod standard_json;

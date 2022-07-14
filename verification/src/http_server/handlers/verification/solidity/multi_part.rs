@@ -14,6 +14,87 @@ use actix_web::{
 };
 use std::str::FromStr;
 
+
+#[utoipa::path(
+    post,
+    path = "/api/v1/solidity/verify/multiple-files",
+    request_body = MultiPartFiles,
+    responses(
+        (
+            status = 200,
+            description = "Verification successful",
+            body = VerificationResponse,
+            example = json!({
+                "status": "success",
+                "result": {
+                    "contracts": {
+                        "contract1": {
+                            "abi": "...",
+                            "bytecode": "...",
+                            "compiler": "solc",
+                            "compiler_version": "0.5.0",
+                            "optimized": false,
+                            "source": "...",
+                            "source_map": "...",
+                            "source_map_url": "...",
+                            "source_url": "...",
+                            "version": "0.5.0",
+                        },
+                        "contract2": {
+                            "abi": "...",
+                            "bytecode": "...",
+                            "compiler": "solc",
+                            "compiler_version": "0.5.0",
+                            "optimized": false,
+                            "source": "...",
+                            "source_map": "...",
+                            "source_map_url": "...",
+                            "source_url": "...",
+                            "version": "0.5.0",
+                        },
+                    },
+                    "errors": [
+                        {
+                            "contract": "contract1",
+                            "error": "...",
+                            "file": "...",
+                            "line": 0,
+                            "location": "...",
+                            "severity": "error",
+                            "title": "...",
+                        },
+                        {
+                            "contract": "contract2",
+                            "error": "...",
+                            "file": "...",
+                            "line": 0,
+                            "location": "...",
+                            "severity": "error",
+                            "title": "...",
+                        },
+                    ],
+                    "metadata": {
+                        "compiler": "solc",
+                        "compiler_version": "0.5.0",
+                        "language": "Solidity",
+                        "language_version": "0.5.0",
+                        "optimized": false,
+                        "version": "0.5.0",
+                    },
+                }
+            }),
+        ),
+    ),
+    params(
+        ("multi_part_files" = MultiPartFiles, description = "Param 1 description", example = json!({
+            "files": {
+                "file1.sol": "...",
+                "file2.sol": "...",
+            },
+        })),
+    ),
+    tag = "solidity"
+)]
 pub async fn verify(
     compilers: web::Data<Compilers<CompilerFetcher>>,
     params: Json<VerificationRequest<MultiPartFiles>>,

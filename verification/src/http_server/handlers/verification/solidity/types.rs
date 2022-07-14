@@ -4,8 +4,9 @@ use ethers_solc::{
 };
 use serde::{Deserialize, Serialize};
 use std::{collections::BTreeMap, path::PathBuf, str::FromStr};
+use utoipa::Component;
 
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Component)]
 pub struct VerificationRequest<T> {
     pub deployed_bytecode: String,
     pub creation_bytecode: String,
@@ -15,7 +16,7 @@ pub struct VerificationRequest<T> {
     pub content: T,
 }
 
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Component)]
 pub struct MultiPartFiles {
     sources: BTreeMap<PathBuf, String>,
     evm_version: String,

@@ -1,4 +1,4 @@
-use paperclip::actix::web::{self, ServiceConfig};
+use paperclip::actix::web::{ServiceConfig};
 
 pub use self::app::AppRouter;
 use self::{solidity::SolidityRouter, sourcify::SourcifyRouter};
@@ -8,11 +8,11 @@ mod solidity;
 mod sourcify;
 
 pub trait Router {
-    fn register_routes(&self, service_config: &mut actix_web::web::ServiceConfig);
+    fn register_routes(&self, service_config: &mut ServiceConfig);
 }
 
 impl<T: Router> Router for Option<T> {
-    fn register_routes(&self, service_config: &mut actix_web::web::ServiceConfig) {
+    fn register_routes(&self, service_config: &mut ServiceConfig) {
         if let Some(router) = self {
             router.register_routes(service_config)
         }
@@ -21,6 +21,6 @@ impl<T: Router> Router for Option<T> {
 
 pub fn configure_router(
     router: &impl Router,
-) -> impl FnOnce(&mut actix_web::web::ServiceConfig) + '_ {
+) -> impl FnOnce(&mut ServiceConfig) + '_ {
     |service_config| router.register_routes(service_config)
 }

@@ -51,6 +51,21 @@ impl Apiv2Schema for VerificationResult {
 
     fn raw_schema() -> DefaultSchemaRaw {
         let mut schema = DefaultSchemaRaw::default();
+        schema.example = Some(
+            serde_json::to_string(&VerificationResult {
+                file_name: "contract.sol".to_string(),
+                contract_name: "Contract".to_string(),
+                compiler_version: "0.5.0".to_string(),
+                evm_version: "byzantium".to_string(),
+                constructor_arguments: Some(DisplayBytes::from(vec![0x01, 0x02, 0x03])),
+                optimization: Some(true),
+                optimization_runs: Some(1),
+                contract_libraries: BTreeMap::new(),
+                abi: "".to_string(),
+                sources: BTreeMap::new(),
+            })
+            .unwrap(),
+        );
         schema
             .properties
             .insert("file_name".to_string(), String::raw_schema().into());

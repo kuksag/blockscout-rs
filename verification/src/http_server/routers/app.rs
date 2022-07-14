@@ -1,4 +1,4 @@
-use paperclip::actix::web::{self};
+use paperclip::actix::web;
 
 use crate::{config::Config, http_server::handlers::status};
 

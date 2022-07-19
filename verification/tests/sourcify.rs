@@ -4,6 +4,7 @@ use actix_web::{
     test::{self, TestRequest},
     App,
 };
+use paperclip::actix::OpenApiExt;
 use serde_json::json;
 use verification::{configure_router, AppRouter, Config, VerificationResponse, VerificationStatus};
 
@@ -16,7 +17,13 @@ async fn should_return_200() {
             .await
             .expect("couldn't initialize the app"),
     );
-    let mut app = test::init_service(App::new().configure(configure_router(&*app_router))).await;
+    let mut app = test::init_service(
+        App::new()
+            .wrap_api()
+            .configure(configure_router(&*app_router))
+            .build(),
+    )
+    .await;
 
     let metadata = include_str!("contracts/storage/metadata.json");
     let source = include_str!("contracts/storage/source.sol");
@@ -76,7 +83,13 @@ async fn invalid_contracts() {
             .await
             .expect("couldn't initialize the app"),
     );
-    let mut app = test::init_service(App::new().configure(configure_router(&*app_router))).await;
+    let mut app = test::init_service(
+        App::new()
+            .wrap_api()
+            .configure(configure_router(&*app_router))
+            .build(),
+    )
+    .await;
 
     let metadata_content = include_str!("contracts/storage/metadata.json");
     let source = include_str!("contracts/storage/source.sol");

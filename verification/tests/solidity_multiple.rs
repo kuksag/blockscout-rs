@@ -6,6 +6,7 @@ use actix_web::{
     App,
 };
 use async_once_cell::OnceCell;
+use paperclip::actix::OpenApiExt;
 use serde_json::json;
 use solidity_multiple_types::TestInput;
 use std::{
@@ -38,7 +39,13 @@ async fn test_setup(
     input: &mut TestInput,
 ) -> (ServiceResponse, Option<DisplayBytes>) {
     let app_router = global_app_router().await;
-    let app = test::init_service(App::new().configure(configure_router(app_router))).await;
+    let app = test::init_service(
+        App::new()
+            .wrap_api()
+            .configure(configure_router(app_router))
+            .build(),
+    )
+    .await;
 
     let prefix = format!("{}/{}", CONTRACTS_DIR, dir);
     let contract_path = format!("{}/source.sol", prefix);

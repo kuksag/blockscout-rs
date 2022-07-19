@@ -4,10 +4,7 @@ use ethers_solc::{
     artifacts::{Libraries, Settings, Source, Sources},
     CompilerInput, EvmVersion,
 };
-use paperclip::{
-    actix::Apiv2Schema,
-    v2::{models::DefaultSchemaRaw, schema::Apiv2Schema},
-};
+use paperclip::{actix::Apiv2Schema, v2::schema::Apiv2Schema};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, PartialEq, Serialize, Apiv2Schema)]
@@ -20,52 +17,12 @@ pub struct VerificationRequest<T> {
     pub content: T,
 }
 
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Deserialize, PartialEq, Apiv2Schema)]
 pub struct MultiPartFiles {
-    sources: BTreeMap<PathBuf, String>,
+    sources: BTreeMap<String, String>,
     evm_version: String,
     optimization_runs: Option<usize>,
     contract_libraries: Option<BTreeMap<String, String>>,
-}
-
-impl Apiv2Schema for MultiPartFiles {
-    fn name() -> Option<String> {
-        Some("MultiPartFiles".to_string())
-    }
-
-    fn description() -> &'static str {
-        "MultiPartFiles"
-    }
-
-    fn required() -> bool {
-        true
-    }
-
-    fn raw_schema() -> DefaultSchemaRaw {
-        let mut schema = DefaultSchemaRaw::default();
-
-        schema.properties.insert(
-            "sources".into(),
-            BTreeMap::<String, String>::raw_schema().into(),
-        );
-        schema.required.insert("sources".into());
-
-        schema
-            .properties
-            .insert("evm_version".into(), String::raw_schema().into());
-        schema.required.insert("evm_version".into());
-
-        schema
-            .properties
-            .insert("optimization_runs".into(), u32::raw_schema().into());
-
-        schema.properties.insert(
-            "contract_libraries".into(),
-            BTreeMap::<String, String>::raw_schema().into(),
-        );
-
-        schema
-    }
 }
 
 impl TryFrom<MultiPartFiles> for CompilerInput {
@@ -97,7 +54,7 @@ impl TryFrom<MultiPartFiles> for CompilerInput {
         let sources: Sources = multi_part
             .sources
             .into_iter()
-            .map(|(name, content)| (name, Source { content }))
+            .map(|(name, content)| (PathBuf::from(name), Source { content }))
             .collect();
         Ok(CompilerInput {
             language: "Solidity".to_string(),
@@ -156,7 +113,7 @@ mod tests {
                     creation_bytecode: "0x6001".into(),
                     compiler_version: "0.8.3".into(),
                     content: MultiPartFiles {
-                        sources: sources(&[("source.sol", "pragma")]),
+                        sources: BTreeMap::from_iter([("source.sol".into(), "pragma".into())]),
                         evm_version: format!("{}", ethers_solc::EvmVersion::London),
                         optimization_runs: Some(200),
                         contract_libraries: None,
@@ -184,11 +141,11 @@ mod tests {
                     creation_bytecode: "0x6001".into(),
                     compiler_version: "0.8.3".into(),
                     content: MultiPartFiles {
-                        sources: sources(&[
-                            ("source.sol", "source"),
-                            ("A.sol", "A"),
-                            ("B", "B"),
-                            ("metadata.json", "metadata"),
+                        sources: BTreeMap::from_iter([
+                            ("source.sol".into(), "source".into()),
+                            ("A.sol".into(), "A".into()),
+                            ("B".into(), "B".into()),
+                            ("metadata.json".into(), "metadata".into()),
                         ]),
                         evm_version: format!("{}", ethers_solc::EvmVersion::SpuriousDragon),
                         optimization_runs: None,
@@ -212,7 +169,7 @@ mod tests {
     #[test]
     fn multi_part_to_input() {
         let mutli_part = MultiPartFiles {
-            sources: sources(&[("source.sol", "pragma")]),
+            sources: BTreeMap::from_iter([("source.sol".into(), "pragma".into())]),
             evm_version: format!("{}", ethers_solc::EvmVersion::London),
             optimization_runs: Some(200),
             contract_libraries: Some(BTreeMap::from([(
@@ -223,7 +180,7 @@ mod tests {
         let expected = r#"{"language":"Solidity","sources":{"source.sol":{"content":"pragma"}},"settings":{"optimizer":{"enabled":true,"runs":200},"outputSelection":{"*":{"":["ast"],"*":["abi","evm.bytecode","evm.deployedBytecode","evm.methodIdentifiers"]}},"evmVersion":"london","libraries":{"source.sol":{"some_library":"some_address"}}}}"#;
         test_to_input(mutli_part, expected);
         let multi_part = MultiPartFiles {
-            sources: sources(&[("source.sol", "")]),
+            sources: BTreeMap::from_iter([("source.sol".into(), "".into())]),
             evm_version: format!("{}", ethers_solc::EvmVersion::SpuriousDragon),
             optimization_runs: None,
             contract_libraries: None,

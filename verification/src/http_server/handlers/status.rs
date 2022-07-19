@@ -1,10 +1,10 @@
-use actix_web::Responder;
-use paperclip::actix::{api_v2_operation, web::HttpResponse};
+use paperclip::actix::{api_v2_operation, NoContent};
 
 #[api_v2_operation(
     summary = "Health check",
-    description = "Returns a 200 response if the server is healthy"
+    description = "Returns a 2xx response if the server is healthy",
+    tags("Health"),
 )]
-pub async fn status() -> impl Responder {
-    HttpResponse::Ok().finish()
+pub async fn status() -> NoContent {
+    NoContent
 }

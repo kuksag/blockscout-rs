@@ -14,8 +14,11 @@ pub mod sourcify;
 
 #[derive(Debug, Deserialize, Serialize, PartialEq, Apiv2Schema)]
 pub struct VerificationResponse {
+    /// Message describing the result of the verification.
     pub message: String,
+    /// The result of the verification.
     pub result: Option<VerificationResult>,
+    /// Status of the verification.
     pub status: VerificationStatus,
 }
 
@@ -25,11 +28,19 @@ pub struct VerificationResult {
     pub contract_name: String,
     pub compiler_version: String,
     pub evm_version: String,
+    /// Constructor arguments description
+    /// `sample code`
     pub constructor_arguments: Option<Bytes>,
+    /// Optimization description
     pub optimization: Option<bool>,
+    /// Optimization runs description
     pub optimization_runs: Option<usize>,
+    /// Contract libraries description
     pub contract_libraries: BTreeMap<String, String>,
+    /// ABI description
+    /// Example: '1.3.37'
     pub abi: String,
+    /// Source map description
     pub sources: BTreeMap<String, String>,
 }
 

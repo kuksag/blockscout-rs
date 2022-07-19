@@ -139,7 +139,10 @@ async fn test_success(dir: &'static str, mut input: TestInput) {
         abi.unwrap_err()
     );
     assert_eq!(
-        verification_result.constructor_arguments, expected_constructor_argument,
+        verification_result
+            .constructor_arguments
+            .map(|args| DisplayBytes::from(args)),
+        expected_constructor_argument,
         "Invalid constructor args"
     );
 

@@ -1,15 +1,13 @@
 #![allow(dead_code)]
 
+use bytes::Bytes;
 use std::{collections::BTreeMap, fmt::Display};
 
 use ethers_solc::CompilerInput;
-use paperclip::{
-    actix::Apiv2Schema,
-    v2::{models::DefaultSchemaRaw, schema::Apiv2Schema},
-};
+use paperclip::actix::Apiv2Schema;
 use serde::{Deserialize, Serialize};
 
-use crate::{compiler::CompilerVersion, solidity::VerificationSuccess, DisplayBytes};
+use crate::{compiler::CompilerVersion, solidity::VerificationSuccess};
 
 pub mod solidity;
 pub mod sourcify;
@@ -21,87 +19,18 @@ pub struct VerificationResponse {
     pub status: VerificationStatus,
 }
 
-#[derive(Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Debug, Deserialize, Serialize, PartialEq, Apiv2Schema)]
 pub struct VerificationResult {
     pub file_name: String,
     pub contract_name: String,
     pub compiler_version: String,
     pub evm_version: String,
-    pub constructor_arguments: Option<DisplayBytes>,
+    pub constructor_arguments: Option<Bytes>,
     pub optimization: Option<bool>,
     pub optimization_runs: Option<usize>,
     pub contract_libraries: BTreeMap<String, String>,
     pub abi: String,
     pub sources: BTreeMap<String, String>,
-}
-
-// We have to "impl Apiv2Schema" instead of "derive Apiv2Schema" because there is no default impl for DisplayBytes
-impl Apiv2Schema for VerificationResult {
-    fn name() -> Option<String> {
-        Some("VerificationResult".to_string())
-    }
-
-    fn description() -> &'static str {
-        "Verification result"
-    }
-
-    fn required() -> bool {
-        false
-    }
-
-    fn raw_schema() -> DefaultSchemaRaw {
-        let mut schema = DefaultSchemaRaw::default();
-        schema.example = Some(
-            serde_json::to_string(&VerificationResult {
-                file_name: "contract.sol".to_string(),
-                contract_name: "Contract".to_string(),
-                compiler_version: "0.5.0".to_string(),
-                evm_version: "byzantium".to_string(),
-                constructor_arguments: Some(DisplayBytes::from(vec![0x01, 0x02, 0x03])),
-                optimization: Some(true),
-                optimization_runs: Some(1),
-                contract_libraries: BTreeMap::new(),
-                abi: "".to_string(),
-                sources: BTreeMap::new(),
-            })
-            .unwrap(),
-        );
-        schema
-            .properties
-            .insert("file_name".to_string(), String::raw_schema().into());
-        schema
-            .properties
-            .insert("contract_name".to_string(), String::raw_schema().into());
-        schema
-            .properties
-            .insert("compiler_version".to_string(), String::raw_schema().into());
-        schema
-            .properties
-            .insert("evm_version".to_string(), String::raw_schema().into());
-        schema.properties.insert(
-            "constructor_arguments".to_string(),
-            String::raw_schema().into(),
-        );
-        schema
-            .properties
-            .insert("optimization".to_string(), bool::raw_schema().into());
-        schema
-            .properties
-            .insert("optimization_runs".to_string(), usize::raw_schema().into());
-        schema.properties.insert(
-            "contract_libraries".to_string(),
-            BTreeMap::<String, String>::raw_schema().into(),
-        );
-        schema
-            .properties
-            .insert("abi".to_string(), String::raw_schema().into());
-        schema.properties.insert(
-            "sources".to_string(),
-            BTreeMap::<String, String>::raw_schema().into(),
-        );
-
-        schema
-    }
 }
 
 impl From<(CompilerInput, CompilerVersion, VerificationSuccess)> for VerificationResult {
@@ -121,7 +50,9 @@ impl From<(CompilerInput, CompilerVersion, VerificationSuccess)> for Verificatio
                 .evm_version
                 .map(|v| v.to_string())
                 .unwrap_or_else(|| "default".to_string()),
-            constructor_arguments: verification_success.constructor_args,
+            constructor_arguments: verification_success
+                .constructor_args
+                .map(|args| Bytes::copy_from_slice(args.to_vec().as_slice())),
             optimization: compiler_input.settings.optimizer.enabled,
             optimization_runs: compiler_input.settings.optimizer.runs,
             contract_libraries: compiler_input
@@ -185,7 +116,7 @@ mod tests {
                     contract_name: "contract_name".to_string(),
                     compiler_version: "compiler_version".to_string(),
                     evm_version: "evm_version".to_string(),
-                    constructor_arguments: Some(DisplayBytes::from([0xca, 0xfe])),
+                    constructor_arguments: Some(Bytes::from_static(&[0xca, 0xfe])),
                     optimization: Some(false),
                     optimization_runs: Some(200),
                     contract_libraries: BTreeMap::from([(
@@ -208,7 +139,7 @@ mod tests {
                         "contract_name": "contract_name",
                         "compiler_version": "compiler_version",
                         "evm_version": "evm_version",
-                        "constructor_arguments": "0xcafe",
+                        "constructor_arguments": [202, 254],
                         "contract_libraries": {
                             "some_library": "some_address",
                         },

@@ -21,8 +21,10 @@ pub async fn run(config: Config) -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .wrap_api()
+            .with_json_spec_at("/api/docs.json")
+            .with_json_spec_v3_at("/api/docs_v3.json")
+            .with_swagger_ui_at("/api/docs")
             .configure(configure_router(&*app_router))
-            .with_json_spec_at("/api/spec/v2")
             .build()
     })
     .bind(socket_addr)?

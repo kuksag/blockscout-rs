@@ -1,0 +1,3 @@
+[submodule "verification/src/proto/googleapis"]
+	path = verification/src/proto/googleapis
+	url = https://fuchsia.googlesource.com/third_party/googleapis

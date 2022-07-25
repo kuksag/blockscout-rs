@@ -1,0 +1,134 @@
+# Generated with protoc-gen-openapi
+# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+
+openapi: 3.0.3
+info:
+    title: VerificationService API
+    version: 0.0.1
+paths:
+    /v1/example/status:
+        get:
+            tags:
+                - VerificationService
+            operationId: VerificationService_Status
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /v1/example/verify:
+        post:
+            tags:
+                - VerificationService
+            description: Verify description.
+            operationId: VerificationService_Verify
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ApiRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/VerificationResponse'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+components:
+    schemas:
+        ApiRequest:
+            type: object
+            properties:
+                address:
+                    type: string
+                    description: 'ApiRequest: address field.'
+                chain:
+                    type: string
+                    description: 'ApiRequest: chain field.'
+                files:
+                    type: object
+                    additionalProperties:
+                        type: string
+                    description: 'ApiRequest: files field.'
+                chosenContract:
+                    type: integer
+                    description: 'ApiRequest: chosen contract field.'
+                    format: uint64
+            description: ApiRequest description.
+        GoogleProtobufAny:
+            type: object
+            properties:
+                '@type':
+                    type: string
+                    description: The type of the serialized message.
+            additionalProperties: true
+            description: Contains an arbitrary serialized message along with a @type that describes the type of the serialized message.
+        Status:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    description: The status code, which should be an enum value of [google.rpc.Code][google.rpc.Code].
+                    format: int32
+                message:
+                    type: string
+                    description: A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the [google.rpc.Status.details][google.rpc.Status.details] field, or localized by the client.
+                details:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/GoogleProtobufAny'
+                    description: A list of messages that carry the error details.  There is a common set of message types for APIs to use.
+            description: 'The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).'
+        VerificationResponse:
+            type: object
+            properties:
+                message:
+                    type: string
+                result:
+                    $ref: '#/components/schemas/VerificationResult'
+        VerificationResult:
+            type: object
+            properties:
+                fileName:
+                    type: string
+                    description: 'VerificationResult: file_name field.'
+                contractName:
+                    type: string
+                compilerVersion:
+                    type: string
+                evmVersion:
+                    type: string
+                constructorArguments:
+                    type: string
+                    format: bytes
+                optimization:
+                    type: boolean
+                optimizationRuns:
+                    type: integer
+                    format: uint64
+                contractLibraries:
+                    type: object
+                    additionalProperties:
+                        type: string
+                abi:
+                    type: string
+                sources:
+                    type: object
+                    additionalProperties:
+                        type: string
+                    description: 'VerificationResult: sources field.'
+            description: VerificationResponse description.
+tags:
+    - name: VerificationService

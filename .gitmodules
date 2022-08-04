@@ -1,0 +1,6 @@
+[submodule "tonic-example/src/proto/googleapis"]
+	path = tonic-example/src/proto/googleapis
+	url = git@github.com:googleapis/googleapis.git
+[submodule "tonic-example/src/proto/grpc-gateway"]
+	path = tonic-example/src/proto/grpc-gateway
+	url = git@github.com:grpc-ecosystem/grpc-gateway.git

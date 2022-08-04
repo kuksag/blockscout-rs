@@ -1,5 +1,6 @@
 [workspace]
 members = [
     "verification",
-    "multichain-api-gateway"
+    "multichain-api-gateway",
+    "tonic-example"
 ]

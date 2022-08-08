@@ -1,20 +1,13 @@
-use std::process::Command;
-
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let output = Command::new("protoc")
-        .args([
-            "src/proto/server_description.proto",
-            "-I=src/proto",
-            "-I=src/proto/googleapis/",
-            "-I=src/proto/grpc-gateway/",
-            "--openapiv2_out=.",
-        ])
-        .status()
-        .expect("Failed to execute process");
-
-    if !output.success() {
-        panic!("Failed to generate OpenAPI v2");
-    }
-
+    tonic_build::configure()
+        .protoc_arg("--openapiv2_out=docs/")
+        .compile(
+            &["src/proto/server_description.proto"],
+            &[
+                "src/proto",
+                "src/proto/googleapis",
+                "src/proto/grpc-gateway",
+            ],
+        )?;
     Ok(())
 }

@@ -1,6 +1,6 @@
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     tonic_build::configure()
-        .protoc_arg("--openapiv2_out=docs/")
+        .protoc_arg("--openapiv2_out=../docs/")
         .compile(
             &["src/proto/server_description.proto"],
             &[
